@@ -1,0 +1,11 @@
+[
+  { "_id": "A101", "title": "Propulsion Assignment", "course": "RS101", "description": "This description for A101", "points": 100, "startDate": "May 2", "dueDate": "May 10" },
+  { "_id": "A102", "title": "Combustion Analysis", "course": "RS101", "description": "This description for A102", "points": 100, "startDate": "May 5", "dueDate": "May 13" },
+  { "_id": "A103", "title": "Nozzle Design Project", "course": "RS101", "description": "This description for A103", "points": 100, "startDate": "May 12", "dueDate": "May 19" },
+  { "_id": "A201", "title": "Aerodynamics Quiz", "course": "RS102", "description": "This description for A201", "points": 100, "startDate": "Jun 8", "dueDate": "Jun 15" },
+  { "_id": "A202", "title": "Flow Analysis", "course": "RS102", "description": "This description for A202", "points": 100, "startDate": "Jun 12", "dueDate": "Jun 19" },
+  { "_id": "A203", "title": "Heating Analysis", "course": "RS102", "description": "This description for A203", "points": 100, "startDate": "Jun 20", "dueDate": "Jun 27" },
+  { "_id": "A301", "title": "Structural Design Task", "course": "RS103", "description": "This description for A301", "points": 100, "startDate": "May 10", "dueDate": "May 17" },
+  { "_id": "A302", "title": "Orbital Calculations", "course": "RS103", "description": "This description for A302", "points": 100, "startDate": "May 15", "dueDate": "May 22" },
+  { "_id": "A303", "title": "Systems Engineering Exam", "course": "RS103", "description": "This description for A303", "points": 100, "startDate": "May 21", "dueDate": "May 28" }
+]
