@@ -1,31 +1,66 @@
-import React from 'react';
-import { useParams, Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { assignments } from "../../Database";
+import { useSelector, useDispatch } from "react-redux";
+import { addAssignment, updateAssignment } from './reducer';
+
 export default function AssignmentEditor() {
+  const { currentUser } = useSelector((state: any) => state.accountReducer);
   const { cid, aid } = useParams();
-  const assignment = assignments.find((assignment) => assignment._id === aid);
-  if (!assignment) {
-    return <div>Assignment not found</div>;
+  const assignments = useSelector((state: any) => state.assignmentsReducer.assignments);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  let asgmt = assignments.find((a: any) => a._id === aid);
+  if (!asgmt) {
+    asgmt = {
+      _id: new Date().getTime().toString(),
+      title: '',
+      description: '',
+      course: cid,
+      points: 100,
+      startDate: '',
+      dueDate: '',
+      untilDate: '',
+    };
   }
+  const [assignment, setAssignment] = useState(asgmt);
+
+  const handleSave = () => {
+    if (assignments.some((a: any) => a._id === aid)) {
+      dispatch(updateAssignment(assignment));
+    } else {
+      dispatch(addAssignment(assignment));
+    }
+    navigate(`/Kanbas/Courses/${cid}/Assignments`);
+  };
 
   return (
     <div id="wd-assignments-editor">
       <div className="mb-3">
         <label htmlFor="input1" className="form-label">Assignment Name</label>
-        <input type="text" className="form-control" id="input1" value={assignment.title}/>
+        <input type="text" className="form-control" id="input1" value={assignment.title}  
+               onChange={(e) => setAssignment({ ...assignment, title: e.target.value })}/>
       </div>
 
-      <div className="form-control" id="wd-description" style={{ minHeight: '150px', overflowY: 'auto', whiteSpace: 'pre-wrap' }}>
       <div className="mb-3">
-        <p>The assignment is <span style={{ color: 'red' }}>available online</span></p>
-        <p>{assignment.description}</p>
+        <label htmlFor="wd-description" className="form-label">Assignment Description</label>
+        <textarea
+              id="wd-description"
+              rows={4}
+              className="form-control"
+              value={assignment.description}
+              onChange={(e) => setAssignment({ ...assignment, description: e.target.value })}
+            />
       </div>
-      </div>
-
+      
+      {currentUser.role === "FACULTY" && (
+      <>
       <div className="mb-3 row">
         <label htmlFor="points" className="col-sm-4 col-form-label text-end">Points</label>
         <div className="col-sm-8">
-          <input type="text" className="form-control" id="points" value={`${assignment.points}`} />
+          <input type="text" className="form-control" id="points" value={assignment.points}
+                 onChange={(e) => setAssignment({ ...assignment, points: e.target.value })} />
         </div>
       </div>
 
@@ -49,31 +84,39 @@ export default function AssignmentEditor() {
           <h5>Assign to</h5>
           <input type="text" className="form-control" id="assign-to" value="Everyone" /><br></br>
           <h5>Due</h5>  
-          <input type="datetime-local" className="form-control" id="wd-due-date" defaultValue="2024-12-06T11:59" /><br></br>
+          <input type="date" className="form-control" id="wd-due-date" value={assignment.dueDate} 
+                 onChange={(e) => setAssignment({ ...assignment, dueDate: e.target.value })}/><br></br>
           <div className="row">
             <div className="col-sm-6">
               <h5>Available from</h5>
-              <input type="datetime-local" className="form-control" id="wd-available-from" defaultValue="2024-09-06T12:00" />
+              <input type="date" className="form-control" id="wd-available-from" value={assignment.startDate}
+                     onChange={(e) => setAssignment({ ...assignment, startDate: e.target.value })} />
             </div>
             <div className="col-sm-6">
               <h5>Until</h5>
-              <input type="date" className="form-control" id="wd-available-until" defaultValue="2024-12-17"/>
+              <input type="date" className="form-control" id="wd-available-until" value={assignment.untilDate}
+                     onChange={(e) => setAssignment({ ...assignment, untilDate: e.target.value })}/>
             </div>
          </div>
         </div>
       </div>
-
       <hr />
-      <Link to={`/Kanbas/Courses/${cid}/Assignments`}>
-        <button id="wd-save-btn" className="btn btn-danger me-1 float-end">
-          Save
-        </button>
-      </Link>
+
+      <button id="wd-save-btn" className="btn btn-danger me-1 float-end" onClick={handleSave}>
+        Save
+      </button>
       <Link to={`/Kanbas/Courses/${cid}/Assignments`}>
         <button id="wd-cancel-btn" className="btn btn-secondary me-1 float-end">
           Cancel
         </button>
       </Link>
+      </>)}
+
+      {currentUser.role !== "FACULTY" && <button id="wd-back-btn" className="btn btn-danger me-1 float-end" 
+              onClick={() => navigate(`/Kanbas/Courses/${cid}/Assignments`)}>
+        Back
+      </button>}
+
 
     </div>
   );

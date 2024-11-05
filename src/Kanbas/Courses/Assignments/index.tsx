@@ -3,11 +3,18 @@ import AssignmentControls from "./AssignmentsControls";
 import { TfiWrite } from "react-icons/tfi";
 import AssignmentControlButton from "./AssignmentControlButton";
 import AssignmentTitleControl from "./AssignmentTitleControl";
-import { Link, useParams } from "react-router-dom";
-import { assignments } from "../../Database";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { FaPencil, FaTrash } from "react-icons/fa6";
+import { deleteAssignment } from "./reducer";
 
 export default function Assignments() {
     const { cid } = useParams();
+    const assignments = useSelector((state: any) => state.assignmentsReducer.assignments);
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const { currentUser } = useSelector((state: any) => state.accountReducer);
+
     return (
       <div id="wd-assignments">
         <AssignmentControls /><br /><br /><br /><br />
@@ -19,8 +26,8 @@ export default function Assignments() {
         </div>
 
         <ul className="wd-lessons list-group rounded-0 wd-padded-left wd-bg-color-green">
-          {assignments.filter(assignment => assignment.course === cid)
-                      .map((assignment) => (
+          {assignments.filter((assignment: any) => assignment.course === cid)
+                      .map((assignment: any) => (
             <li key={assignment._id} className="wd-lesson list-group-item d-flex align-items-center p-3">
               <div className="icon-container me-2">
                 <BsGripVertical className="fs-3" />
@@ -39,6 +46,13 @@ export default function Assignments() {
                     <span className="wd-fg-color-black"> | <b>Not available until</b> {`${assignment.startDate} at 12:00am`} | <b>Due</b> {`${assignment.dueDate} at 11:59pm`} | {`${assignment.points}`} pts</span>
                 </h6>
               </div>
+              {currentUser.role === "FACULTY" && (
+              <>
+              <FaPencil onClick={() => navigate(`/Kanbas/Courses/${cid}/Assignments/${assignment._id}`)} className="text-primary me-3" />
+              <FaTrash className="text-danger me-2 mb-1" 
+                       onClick={() => window.confirm("You sure delete this assignment?") && dispatch(deleteAssignment(assignment._id))}/>
+              </>
+              )}
               <div className="control-buttons">
                 <AssignmentControlButton />
               </div>
