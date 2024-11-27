@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { assignments } from "../../Database";
+//import { assignments } from "../../Database";
 import { useSelector, useDispatch } from "react-redux";
 import { addAssignment, updateAssignment } from './reducer';
+import * as coursesClient from "../client";
+import * as assignmentsClient from "./client";
 
 export default function AssignmentEditor() {
   const { currentUser } = useSelector((state: any) => state.accountReducer);
   const { cid, aid } = useParams();
-  const assignments = useSelector((state: any) => state.assignmentsReducer.assignments);
+  const { assignments } = useSelector((state: any) => state.assignmentsReducer);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -26,11 +28,13 @@ export default function AssignmentEditor() {
   }
   const [assignment, setAssignment] = useState(asgmt);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (assignments.some((a: any) => a._id === aid)) {
-      dispatch(updateAssignment(assignment));
+      const assignmentUpdates = await assignmentsClient.updateAssignment(assignment);
+      dispatch(updateAssignment(assignmentUpdates));
     } else {
-      dispatch(addAssignment(assignment));
+      const newAssignment = await coursesClient.createAssignmentForCourse(cid as string, assignment);
+      dispatch(addAssignment(newAssignment));
     }
     navigate(`/Kanbas/Courses/${cid}/Assignments`);
   };
@@ -102,7 +106,7 @@ export default function AssignmentEditor() {
       </div>
       <hr />
 
-      <button id="wd-save-btn" className="btn btn-danger me-1 float-end" onClick={handleSave}>
+      <button id="wd-save-btn" className="btn btn-danger me-1 float-end" onClick={ handleSave }>
         Save
       </button>
       <Link to={`/Kanbas/Courses/${cid}/Assignments`}>

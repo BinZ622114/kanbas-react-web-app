@@ -6,14 +6,34 @@ import AssignmentTitleControl from "./AssignmentTitleControl";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { FaPencil, FaTrash } from "react-icons/fa6";
-import { deleteAssignment } from "./reducer";
+import { setAssignments, deleteAssignment } from "./reducer";
+import * as coursesClient from "../client";
+import * as assignmentsClient from "./client";
+import { useEffect, useState } from "react";
 
 export default function Assignments() {
     const { cid } = useParams();
-    const assignments = useSelector((state: any) => state.assignmentsReducer.assignments);
+    const { assignments } = useSelector((state: any) => state.assignmentsReducer);
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const { currentUser } = useSelector((state: any) => state.accountReducer);
+
+    const fetchAssignments = async () => {
+      try {
+        const assignments = await coursesClient.findAssignmentsForCourse( cid as string );
+        dispatch(setAssignments(assignments));
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    useEffect(() => {
+      fetchAssignments();
+    }, []);
+
+    const removeAssignment = async (aid: string) => {
+      await assignmentsClient.deleteAssignment(aid);
+      dispatch(deleteAssignment(aid));
+    };
 
     return (
       <div id="wd-assignments">
@@ -26,8 +46,7 @@ export default function Assignments() {
         </div>
 
         <ul className="wd-lessons list-group rounded-0 wd-padded-left wd-bg-color-green">
-          {assignments.filter((assignment: any) => assignment.course === cid)
-                      .map((assignment: any) => (
+          {assignments.map((assignment: any) => (
             <li key={assignment._id} className="wd-lesson list-group-item d-flex align-items-center p-3">
               <div className="icon-container me-2">
                 <BsGripVertical className="fs-3" />
@@ -50,7 +69,7 @@ export default function Assignments() {
               <>
               <FaPencil onClick={() => navigate(`/Kanbas/Courses/${cid}/Assignments/${assignment._id}`)} className="text-primary me-3" />
               <FaTrash className="text-danger me-2 mb-1" 
-                       onClick={() => window.confirm("You sure delete this assignment?") && dispatch(deleteAssignment(assignment._id))}/>
+                       onClick={() => window.confirm("You sure delete this assignment?") && removeAssignment(assignment._id)}/>
               </>
               )}
               <div className="control-buttons">
