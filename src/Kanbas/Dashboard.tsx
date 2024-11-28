@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { addEnrollment, deleteEnrollment, setEnrollments } from "./Courses/enrollmentsReducer";
 import * as courseClient from "./Courses/client";
+import * as userClient from "./Account/client";
 
 export default function Dashboard(
   { courses, course, setCourse, addNewCourse,
@@ -17,6 +18,7 @@ export default function Dashboard(
   const dispatch = useDispatch();
   const [displayAllCourses, setDisplayAllCourses] = useState(false);
   const [allCourses, setAllCourses] = useState<any[]>([]);
+  const [enrolledCourses, setEnrolledCourses] = useState<any[]>([]);
 
   const isEnrolledCourse = (course: any) => enrollments.some(
       (enrollment: any) => currentUser && enrollment.user === currentUser._id &&       
@@ -38,10 +40,19 @@ export default function Dashboard(
       console.error(error);
     }
   };
+  const fetchEnrolledCourses = async () => {
+    try {
+      const enrolledCourses = await userClient.findMyCourses();
+      setEnrolledCourses(enrolledCourses);
+    } catch (error) {
+      console.error(error);
+    }
+  };
   useEffect(() => {
+    fetchEnrolledCourses();
     fetchAllCourses();
     fetchEnrollments();
-  }, []);
+  }, [currentUser, enrollments]);
 
   return (
     <div id="wd-dashboard">
@@ -75,7 +86,7 @@ export default function Dashboard(
       <h2 id="wd-dashboard-published">Published Courses ({courses.length})</h2> <hr />
       <div id="wd-dashboard-courses" className="row">
         <div className="row row-cols-1 row-cols-md-5 g-4">
-          {(displayAllCourses ? allCourses : courses)
+          {(displayAllCourses ? allCourses : enrolledCourses)
             .map((course: any) => (
             <div className="wd-dashboard-course col" style={{ width: "300px" }}>
               <div className="card rounded-3 overflow-hidden">

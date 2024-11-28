@@ -25,7 +25,7 @@ export default function Kanbas() {
   };
   useEffect(() => {
     fetchCourses();
-  }, [currentUser, enrollments]);
+  }, [currentUser]);
 
   const [course, setCourse] = useState<any>({
     _id: "0", name: "New Course", number: "New Number",
