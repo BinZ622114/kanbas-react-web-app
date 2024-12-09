@@ -12,11 +12,13 @@ export default function AccountNavigation() {
         <div key={link}>
           <Link
             to={`/Kanbas/Account/${link}`}
-            className={pathname.includes(link) ? "active-link" : ""}
+            className={pathname.includes(`${link}`) ? "active-link" : ""}
           >
             {link}
           </Link>
         </div>
       ))}
+      {currentUser && currentUser.role === "ADMIN" && (
+       <Link to={`/Kanbas/Account/Users`} className={`list-group-item ${pathname.includes("Users") ? "active-link" : ""}`}> Users </Link> )}
     </div>
 );}

@@ -55,7 +55,7 @@ export default function Assignments() {
               <div className="assignment-details flex-grow-1">
                 <strong>
                 <Link to={`/Kanbas/Courses/${cid}/Assignments/${assignment._id}`} className="wd-_id">
-                  {assignment._id}
+                  {assignment.title}
                 </Link>
                 </strong>
                 <h6>
